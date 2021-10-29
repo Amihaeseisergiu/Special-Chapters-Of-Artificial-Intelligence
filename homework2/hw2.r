@@ -8,7 +8,7 @@ ex2 = function()
 	for(pr in c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9))
 	{
 		pdf(file=
-			paste("D:\\Facultate\\Capitole Speciale de Inteligenta Artificiala\\tema2\\plots\\binom_", pr, ".pdf", sep=""),
+			paste("D:\\Facultate\\Capitole Speciale de Inteligenta Artificiala\\homework2\\plots\\binom_", pr, ".pdf", sep=""),
 			width=4, height=4
 		   )
 		
