@@ -66,7 +66,7 @@ ex4 = function(obs)
 	sse = sum( (y - y_estimate)^2 )
 	s = sqrt(sse / (length(y) - 2))
 	sb = s / sqrt(sum( (x-x_mean)^2 ))
-	t = 2.571
+	t = qt(0.975, df=(length(x) - 2))
 	
 	blow = b - t*sb
 	bhigh = b + t*sb
