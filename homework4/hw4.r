@@ -70,9 +70,9 @@ best_subset = function(y, x)
 				best_comb_measures[3] = local_measures[3]
 				best_ra_comb = combs[, comb]
 			}
-			if(abs(local_measures[4] - (pred+1)) < abs(best_comb_measures[4] - (pred+1)))
+			if(abs(local_measures[4] - (pred+1)) < best_comb_measures[4])
 			{
-				best_comb_measures[4] = local_measures[4]
+				best_comb_measures[4] = abs(local_measures[4] - (pred+1))
 				best_cp_comb = combs[, comb]
 			}
 		}
