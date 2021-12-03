@@ -123,10 +123,63 @@ forward_selection = function(y, x, significance)
 	significant_preds
 }
 
+backward_selection = function(y, x, significance)
+{
+	significant_preds = 1:ncol(x)
+
+	while(length(significant_preds) != 0)
+	{
+		most_insignificant = NULL
+		most_insignificance = -1
+		s = coefficients(
+				summary(
+					lm(y~x[,significant_preds])
+				))[-1, 4]
+		current_pred = 0
+
+		for(si in s)
+		{
+			current_pred = current_pred + 1
+
+			if(si > significance &&
+				si > most_insignificance)
+			{
+				most_insignificant = 
+					significant_preds[current_pred]
+				most_insignificance = si
+			}
+		}
+
+		if(is.null(most_insignificant))
+			break
+		
+		significant_preds = significant_preds[
+			significant_preds != most_insignificant]
+	}
+
+	significant_preds
+}
+
 get_all = function(y, x, cp_index)
 {
 	data = best_subset(y, x)
-	data[[4]][cp_index,][[2]]
+	preds = data[[4]][cp_index,][[2]]
+
+	estimate_y(y, x[, preds])
+}
+
+get_forward_selection = function(y, x, significance)
+{
+	preds = forward_selection(y, x, significance)
+	
+	estimate_y(y, x[, preds])
+}
+
+get_backward_selection = function(y, x, significance)
+{
+	preds = backward_selection(y, x , significance)
+	
+	estimate_y(y, x[, preds])
 }
 
 ex1 = function()
@@ -141,5 +194,6 @@ ex1 = function()
 	x = data.matrix(data[,-1])
 	
 	#all = get_all(y, x, 6)
-	forward_selection(y, x, 0.05)
+	#forward = get_forward_selection(y, x, 0.05)
+	#backward = get_backward_selection(y, x, 0.05)
 }
