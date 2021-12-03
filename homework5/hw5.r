@@ -248,6 +248,38 @@ get_stepwise_selection = function(y, x, significance)
 	estimate_y(y, x[, preds])
 }
 
+plot_and_save = function(y, all, forward, backward, stepwise)
+{
+	pdf(file=paste0(
+		"D:\\Facultate\\",
+		"Capitole Speciale de Inteligenta Artificiala\\",
+		"homework5\\graphs\\",
+		"Methods Comparison", ".pdf"),
+		width=8, height=8)
+
+	pmin = min(rbind(all, forward, backward, stepwise))
+	pmax = max(rbind(all, forward, backward, stepwise))
+
+	plot(pmin:pmax, pmin:pmax, type='n',
+		main="Methods Comparison",
+		xlab="y",
+		ylab="y predicted")
+
+	legend('topleft',
+		legend=c('All', 'Forward', 'Backward', 'Stepwise'),
+		col=c('red', 'blue', 'green', 'coral'),
+		pch=c(19, 19, 19, 19),
+		bty='n')
+
+	abline(0,1, lwd=3)
+	points(y, all, pch=19, lwd=1, col='red', cex=2)
+	points(y, forward, pch=19, lwd=1, col='blue', cex=1.6)
+	points(y, backward, pch=19, lwd=1, col='green', cex=1.2)
+	points(y, stepwise, pch=19, lwd=1, col='coral', cex=0.8)
+
+	dev.off()
+}
+
 ex1 = function()
 {
 	data = read.table(
@@ -259,8 +291,10 @@ ex1 = function()
 	y = data[,1]
 	x = data.matrix(data[,-1])
 	
-	#all = get_all(y, x, 6)
-	#forward = get_forward_selection(y, x, 0.05)
-	#backward = get_backward_selection(y, x, 0.05)
-	#stepwise = get_stepwise_selection(y, x, 0.05)
+	all = get_all(y, x, 6)
+	forward = get_forward_selection(y, x, 0.05)
+	backward = get_backward_selection(y, x, 0.05)
+	stepwise = get_stepwise_selection(y, x, 0.05)
+
+	plot_and_save(y, all, forward, backward, stepwise)
 }
