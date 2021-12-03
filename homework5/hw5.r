@@ -86,6 +86,11 @@ best_subset = function(y, x)
 	rbind(list(best_rss), list(best_r), list(best_ra), list(best_cp))
 }
 
+get_p_values = function(y, x)
+{
+	coefficients(summary(lm(y~x)))[-1, 4]
+}
+
 forward_selection = function(y, x, significance)
 {
 	remaining_preds = 1:ncol(x)
@@ -98,10 +103,7 @@ forward_selection = function(y, x, significance)
 		
 		for(pred in remaining_preds)
 		{
-			s = coefficients(
-				summary(
-					lm(y~x[,c(significant_preds, pred)])
-				))[-1, 4]
+			s = get_p_values(y, x[,c(significant_preds, pred)])
 			pred_significance = s[length(s)]
 			
 			if(pred_significance <= significance && 
@@ -131,10 +133,7 @@ backward_selection = function(y, x, significance)
 	{
 		most_insignificant = NULL
 		most_insignificance = -1
-		s = coefficients(
-				summary(
-					lm(y~x[,significant_preds])
-				))[-1, 4]
+		s = get_p_values(y, x[,significant_preds])
 		current_pred = 0
 
 		for(si in s)
@@ -155,6 +154,66 @@ backward_selection = function(y, x, significance)
 		
 		significant_preds = significant_preds[
 			significant_preds != most_insignificant]
+	}
+
+	significant_preds
+}
+
+stepwise_selection = function(y, x, significance)
+{
+	remaining_preds = 1:ncol(x)
+	significant_preds = c()
+
+	while(length(remaining_preds) != 0)
+	{
+		most_significant = NULL
+		most_significance = 2
+		
+		for(pred in remaining_preds)
+		{
+			s = get_p_values(y, x[,c(significant_preds, pred)])
+			pred_significance = s[length(s)]
+			
+			if(pred_significance <= significance && 
+				pred_significance < most_significance)
+			{
+				most_significant = pred
+				most_significance = pred_significance
+			}
+		}
+
+		if(is.null(most_significant))
+			break
+		
+		remaining_preds = remaining_preds[
+			remaining_preds != most_significant]
+		significant_preds = c(significant_preds, most_significant)
+
+		most_insignificant = NULL
+		most_insignificance = -1
+		s = get_p_values(y, x[,significant_preds])
+		current_pred = 0
+
+		for(si in s)
+		{
+			current_pred = current_pred + 1
+
+			if(si > significance &&
+				si > most_insignificance)
+			{
+				most_insignificant = 
+					significant_preds[current_pred]
+				most_insignificance = si
+			}
+		}
+
+		if(!is.null(most_insignificant))
+		{
+			significant_preds = significant_preds[
+				significant_preds != most_insignificant]
+			remaining_preds = c(remaining_preds,
+				most_insignificant)
+		}
 	}
 
 	significant_preds
@@ -182,6 +241,13 @@ get_backward_selection = function(y, x, significance)
 	estimate_y(y, x[, preds])
 }
 
+get_stepwise_selection = function(y, x, significance)
+{
+	preds = stepwise_selection(y, x, significance)
+
+	estimate_y(y, x[, preds])
+}
+
 ex1 = function()
 {
 	data = read.table(
@@ -196,4 +262,5 @@ ex1 = function()
 	#all = get_all(y, x, 6)
 	#forward = get_forward_selection(y, x, 0.05)
 	#backward = get_backward_selection(y, x, 0.05)
+	#stepwise = get_stepwise_selection(y, x, 0.05)
 }
